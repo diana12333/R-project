@@ -23,7 +23,7 @@ power.1<-Emperical.power(N, alpha, sd,delta,mu1)
 View(power.1)
 plot.emperical.power(power.1)
 ```
-![example1](/Users/dianshen/Desktop/Screen Shot 2019-11-11 at 11.03.20 AM.png)
+![example1](https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower1.png)
 
 ```r
 N <- c(20, 40)
@@ -35,4 +35,4 @@ power.2<-Emperical.power(N, alpha, sd,delta,mu1)
 View(power.2)
 plot.emperical.power(power.2)
 ```
-![example2](/Users/dianshen/Desktop/Screen Shot 2019-11-11 at 11.03.20 AM.png)
+![example2](https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png)
