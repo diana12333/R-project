@@ -23,7 +23,8 @@ power.1<-Emperical.power(N, alpha, sd,delta,mu1)
 View(power.1)
 plot.emperical.power(power.1)
 ```
-![example1](https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower1.png)
+
+<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower1.png" width="600">
 
 ```r
 N <- c(20, 40)
@@ -35,8 +36,10 @@ power.2<-Emperical.power(N, alpha, sd,delta,mu1)
 View(power.2)
 plot.emperical.power(power.2)
 ```
-![example2](https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png)
+
+<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png" width="650">
 
 ## Daxing Population Analysis
 ### the Map Visualization of Anaysis is as follows
-![Visualization](https://github.com/diana12333/R-project/blob/master/DaxingPopulationAnalysis/map_new.gif)
+
+<img src="https://github.com/diana12333/R-project/blob/master/DaxingPopulationAnalysis/map_new.gif" width="500">
