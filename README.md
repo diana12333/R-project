@@ -36,3 +36,7 @@ View(power.2)
 plot.emperical.power(power.2)
 ```
 ![example2](https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png)
+
+## Daxing Population Analysis
+### the Map Visualization of Anaysis is as follows
+![Visualization](https://github.com/diana12333/R-project/blob/master/DaxingPopulationAnalysis/map_new.gif)
