@@ -45,4 +45,4 @@ plot.emperical.power(power.2)
 ## Daxing Population Analysis
 ### the Map Visualization of Anaysis is as follows
 
-<img src="https://github.com/diana12333/R-project/blob/master/DaxingPopulationAnalysis/map_new.gif" width="500">
+<img src="https://github.com/diana12333/R-project/blob/master/DaxingPopulationAnalysis/map_new.gif" width="200">
