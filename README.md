@@ -6,9 +6,9 @@ It's a visualization project to visualize the time series data of australia weat
 publish at [shinyaap.io changshen](https://changshen.shinyapps.io/shiny/)
 
 ## multivariate time series 
-###1.The presentation slide available at [here](https://slides.com/changshen/multivariate#/)
-###2. The proposal and report
-###3. code for data manipulation and modelling(to be uploaded)
+### 1.The presentation slide available at [here](https://slides.com/changshen/multivariate#/)
+### 2. The proposal and report
+### 3. code for data manipulation and modelling(to be uploaded)
 
 ## Myfunction
 list some of the simple functions I write for statistical computing or visualization
