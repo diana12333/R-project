@@ -27,7 +27,7 @@ View(power.1)
 plot.emperical.power(power.1)
 ```
 
-<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower1.png" width="600">
+<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower1.png" width="500">
 
 ```r
 N <- c(20, 40)
@@ -40,7 +40,7 @@ View(power.2)
 plot.emperical.power(power.2)
 ```
 
-<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png" width="650">
+<img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png" width="550">
 
 ### 3. stratified
 > a function for stratified randomization for a two-arm study
