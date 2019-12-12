@@ -42,6 +42,15 @@ plot.emperical.power(power.2)
 
 <img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png" width="650">
 
+### 3. 
+> a function for stratified randomization for a two-arm study
+> Example: returned a list include stratified randomized data set, seed, distribution summary
+```r
+testa <- stratified(t=2, s=4, samplesize = 100, equal = TRUE, seed = 89676);testa
+testb <- stratified(t=3, s=3, samplesize = c(80, 70, 50), equal = FALSE, seed = 124589);testb
+testc <- stratified(t=5, s=3, samplesize = 60, equal = TRUE, seed = 907563);testc
+```
+
 ## Daxing Population Analysis
 ### the Map Visualization of Anaysis is as follows
 
