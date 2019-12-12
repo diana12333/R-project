@@ -42,7 +42,7 @@ plot.emperical.power(power.2)
 
 <img src="https://github.com/diana12333/R-project/blob/master/Myfunction/image/EmpricalPower2.png" width="650">
 
-### 3. 
+### 3. stratified
 > a function for stratified randomization for a two-arm study
 > Example: returned a list include stratified randomized data set, seed, distribution summary
 ```r
