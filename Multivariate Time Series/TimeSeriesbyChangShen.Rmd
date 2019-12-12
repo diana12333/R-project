@@ -43,7 +43,7 @@ latex(describe(ts_au))
 ```{r geological data}
 ts_au_missing <- ts_au%>%group_by(Location)%>%
   dplyr::summarise(na=sum(is.na(MaxTemp)))%>%arrange(desc(na))
-register_google(key = "AIzaSyBhIR53bg41DINnnIEUcGtzpJf3uNhT9-4")
+register_google(key = "xxxxxxxx")
 lonlat<-data.frame(Location=unique(ts_au$Location))
 lonlat$Location<-paste("Australia",as.character(lonlat$Location))
 lonlat<-mutate_geocode(lonlat,Location)
