@@ -5,7 +5,7 @@
 It's a visualization project to visualize the time series data of australia weather and spatial map visualization from 2013 to 2017.
 publish at [shinyaap.io changshen](https://changshen.shinyapps.io/shiny/)
 
-## multivariate time series 
+## multivariate time series（Sydney Weather Forecasting） 
 ### 1.The presentation slide available at [here](https://slides.com/changshen/multivariate#/)
 ### 2. The proposal and report
 ### 3. code for data manipulation and modelling(to be uploaded)
