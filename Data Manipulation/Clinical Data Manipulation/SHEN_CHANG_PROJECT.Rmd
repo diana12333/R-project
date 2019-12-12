@@ -1,0 +1,338 @@
+---
+title: "Clinical Data Analysis"
+author: "ChangShen"
+date: "10/31/2019"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE,error = TRUE)
+knitr::opts_knit$set(root.dir="/Users/dianshen/Desktop/SAS/R Project/Data for R Project")
+options(repos =  "http://cran.us.r-project.org")
+if(!"pacman" %in%installed.packages()) install.packages("pacman")
+library(pacman)
+p_load(dplyr,tidyr,plyr,readr,lubridate,Hmisc,knitr,ggplot2, gridExtra)
+```
+
+
+
+```{r read  files}
+## read in the csv files that you need
+#>Note: change the path to your local path that contains your .csv files, make sure you data is sorted by name ascending
+myfiles = list.files(path=getwd(), pattern="*.csv", full.names=TRUE)
+myfilenames<-c("CohortCW","IDiagnosisCW","InpatientVisits","LabCW","MainPatientFile","MedicationCW","Medications","ODiagnosisCW","OutpatientLabs","OutpatientVisits")
+for(i in 1:length(myfiles))
+{
+  filename=myfiles[i];
+  data=read_csv(file = filename)
+  assign(x = myfilenames[i],value = data)
+}
+rm(data)
+```
+
+
+
+```{r}
+## functions: transfer a SAS date data in to R .Date format
+DateTransfer <- function(x){format(as.Date(x, origin="1960-01-01"))}
+```
+
+
+	
+```{r connect files}
+## connect the files
+#Connect the linkage files with the main files to produce more meaningful results.
+
+##---------------------------------##
+## Mainpatient File data cleaning  ##
+##---------------------------------##
+#1. Create Birthdate&RecordDate by combining month/day/year and transfer to Date format
+#2. Caluculate age at record from birthdate and recorddate(round to 2 decimal)
+#3. Create catgorical variable Agecat(older(1)>=50/younger(0)<50)
+#4. Connect CohortCW to determine unique ID for each observations.
+#5. Only keep the most recent observarion for each Unique ID.
+#6. Keep the neccessary variables and arrange by Unique ID
+#---------------------------------------------------------------------------------------------
+
+MainPatientFile <- MainPatientFile%>%unite("BirthDate",c("month_birth","day_birth","year_birth"),sep="/")%>%
+  mutate(year=record_year)%>%
+  unite("RecordDate",c("record_month","record_day","record_year"),sep="/")%>%
+  mutate(BirthDate=as.Date(BirthDate,format="%m/%d/%Y"),
+         RecordDate=as.Date(RecordDate,format="%m/%d/%Y"),
+         Age = round(as.numeric(difftime(RecordDate,BirthDate))/365.25,2),
+         Agecat = ifelse(Age>=50,1,0)
+         )%>%
+  mutate(BirthDate = format(BirthDate,"%m/%d/%Y"))%>%
+  left_join(CohortCW,by=c("siteID","SiteNo"))%>%
+  group_by(uniqueID)%>%arrange(RecordDate)%>%filter(row_number()==n())%>%
+  select(uniqueID, sex,BirthDate, race, marital_status, income_bracket, Age, Agecat)%>%arrange(uniqueID)
+
+##----------------------------------------##
+## OutpatientLabs File data manipulation  ##
+##----------------------------------------##
+#1. Date Transformation to R Date format
+#2. Left Join Lab_code and CohortCW dataset to OutpatientLabs
+#3. Transfer numeric lab result to numeric format(note missing numeric lab result will be transfer as 0, 
+#will transfer back to NA in next chunk )
+#----------------------------------------------------------------------------------------------------------
+OutpatientLabs <- OutpatientLabs%>%left_join(LabCW, by="lab_code")%>%left_join(CohortCW[,1:2], by = "siteID")%>%mutate(
+  labdate = DateTransfer(labdate),
+  numeric_lab_result = as.numeric(numeric_lab_result)
+)
+
+##-----------------------------------------##
+## OutpatientVisit File data manipulation  ##
+##-----------------------------------------##
+#1. Date Transformation to R Date format
+#2. Left Join ODiagnosisCW and CohortCW dataset to OutpatientLabs
+#----------------------------------------------------------------------------------------------------------
+OutpatientVisits <- OutpatientVisits%>%left_join(ODiagnosisCW, by=c("diagnosis_code"="Diagnosis_code"))%>%
+  left_join(CohortCW[,1:2], by = "siteID")%>%
+  mutate(
+  visitdate = DateTransfer(visitdate)
+)
+
+##-----------------------------------------##
+##  InpatientVisit File data manipulation  ##
+##-----------------------------------------##
+#1. Date Transformation(admitdate&dischargedate) to R Date format
+#2. Left Join IDiagnosisCW and CohortCW dataset to OutpatientLabs
+#----------------------------------------------------------------------------------------------------------
+InpatientVisits <- InpatientVisits%>%left_join(IDiagnosisCW, by=c("diagnosis_code"="Diagnosis_code"))%>%
+  left_join(CohortCW[,1:2], by = "siteID")%>%
+  mutate(
+  admitdate = DateTransfer(admitdate),
+  dischargedate = DateTransfer(dischargedate)
+)
+
+##-----------------------------------------##
+##    Medications File data manipulation   ##
+##-----------------------------------------##
+#1. Datetransfer
+#2. left join MedicationCW and CohortCW
+Medications <- Medications%>%left_join(MedicationCW,by="medication_code")%>%left_join(CohortCW[,1:2], by = "siteID")%>%
+  mutate(PrescriptionDate = DateTransfer(PrescriptionDate))
+
+```
+
+
+```{r A1}
+# define A1 for all A1 disease diagnose
+# define Unique for all Unique ID
+A1 <- c("A1",paste("A1.",1:6,sep=""))
+Unique <- data.frame(uniqueID = unique(CohortCW$uniqueID))
+
+#---------------------------------------------------------------------
+#Summarize the inpatient visit result of A1 for each unique ID
+#Output Data set:
+#InpatientVisits_A1
+#Variables:
+# uniqueID - patient ID unique for each patient
+# n_A1-  how many times are they diagnosed A1 prior to 2015
+#----------------------------------------------------------------------
+InpatientVisits_A1 <- InpatientVisits%>%filter(year(admitdate)<2015)%>%group_by(uniqueID)%>%
+  dplyr::summarise(n_A1 = sum(Diagnosis %in% A1),n_Site = n())
+
+#--------------------------------------------------------------------
+#Summarize the outpatient visit result of A1 for each unique ID
+#Output Data set:
+#OutpatientVisits_A1
+#Variables:
+# uniqueID - patient ID unique for each patient
+# n_A1_out- how many times are they diagnosed A1 in OutpatientVisits prior to 2015
+#---------------------------------------------------------------------
+OutpatientVisits_A1 <- OutpatientVisits%>%filter(year(visitdate)<2015)%>%group_by(uniqueID, visitdate)%>%
+  dplyr::summarise(n_A1_out = sum(Diagnosis %in% A1))%>%ungroup()%>%group_by(uniqueID)%>%
+  dplyr::summarise(n_A1_out = sum(n_A1_out))
+
+#combined the two data sets and condition on 
+DiseaseA <- full_join(InpatientVisits_A1,OutpatientVisits_A1, by='uniqueID')%>%
+          right_join(Unique,by='uniqueID')%>%
+          mutate(n_A1 = replace_na(n_A1, 0),
+                 n_A1_out = replace_na(n_A1_out, 0),
+                 A1 = ifelse(n_A1_out>=2 & n_A1>=1,1,0))%>%select(uniqueID, A1)
+
+```
+
+```{r group disease X}
+##summarize and find the date for last lab result of each Unique ID and lab name 
+OutpatientLabs <- OutpatientLabs%>%group_by(uniqueID,LabName)%>%
+  dplyr::summarise(max_labdate=max(labdate))%>%right_join(OutpatientLabs)
+#--------------------------------------------------------------------
+#Summarize the outpatient visit result of Disease X for each unique ID
+#Output Data set:
+#ODiseaseX
+#Variables:
+# uniqueID - patient ID unique for each patient
+# PPP- whether the last lab record for ppp is positive
+# KOPD- whether the last lab record KOPD>2
+#---------------------------------------------------------------------
+DiseaseX <- OutpatientLabs%>%
+  mutate(PPP = ifelse((LabName=="PPP")&(max_labdate==labdate)&(qual_results=="Positive"),1,0),
+         KOPD = ifelse((LabName=="KOPD")&(numeric_lab_result>2),1,0))%>%group_by(uniqueID)%>%
+  dplyr::summarise(DiseaseX = as.logical(sum(PPP))|as.logical(sum(KOPD)))%>%
+  right_join(Unique,by='uniqueID')%>%mutate(DiseaseX = replace_na(DiseaseX, 0))
+```
+
+```{r WE}
+Medication <- Medications%>%
+  filter(year(PrescriptionDate) %in% c(2015,2016) & `Medication Name`=="WE")
+
+
+#--------------------------------------------------------------------------------------
+#Summarize the outpatient visit result of Disease X for each unique ID
+#Output Data set:
+# Medications_WE
+#Variables:
+# uniqueID - patient ID unique for each patient
+# duration- prescription of medication duration for each paitient during 2015 and 2016
+# WE_6_M- indicator for those who have prescription duration more than 180 days during 
+# 2015 and 2016 
+#--------------------------------------------------------------------------------------
+Medications_WE <-Medication%>%group_by(uniqueID)%>%
+  dplyr::summarise(duration = sum(dayssupply*(Refills+1)))%>%right_join(Unique)%>%
+  mutate(duration = replace_na(duration, 0),
+        WE_6_M =as.numeric(duration>180))%>%select(uniqueID, WE_6_M)
+
+# add WE indicator to show whether the paitient had a WE prescription during 2015 and 2016 and 
+#diagnosed A1 prior to 2015
+DiseaseA <- DiseaseA%>%mutate(
+  WE_indicator = ifelse((uniqueID %in% Medication$uniqueID)&(A1==1),1,0)
+)
+```
+
+
+```{r formatdata}
+#--------------------------------------------------------------------------------------
+#merge 4 datasets we created before to produce the FINALDATA
+#Output Data set:
+#FINALDATA
+#Variables:
+# uniqueID - patient ID unique for each patient
+# Sex - 
+# Birthdate- with format(mm/dd/yyyy)
+# race - 
+# martital status
+# income_braket
+# Age 
+# Agecat - age category(younger/older)
+# A1 - Indicator of whether an individual has chronic condition A1 prior to 2015
+# DiseaseX- Indicator of whether an individual has been diagnosed with disease X
+# WE_indicator - Indicator of receipt of prescription WE any time during 2015 and 2016 for those with chronic condition A1 prior to 2015 (A1 created above)
+# WE_6_M - Indicator of receipt of WE longer than 6 months.
+#--------------------------------------------------------------------------------------
+FINALDATA <- Reduce(function(...) merge(..., by='uniqueID', all.x=TRUE), list(MainPatientFile,DiseaseA,Medications_WE,DiseaseX))
+
+
+# Standardize the format of the final main patient data set
+FINALDATA <- FINALDATA%>%
+  mutate(sex = mapvalues(sex, from = c("0","1"), to = c("Female","Male")),
+         race = mapvalues(race, from = as.character(0:5), to = 
+                            c("White", "Black", "Asian", "Native American", "Pacific Islander", "Unknown")),
+         marital_status = mapvalues(marital_status, from = as.character(1:6), to = 
+                                      c("Married", "Divorced", "Separated", "Widowed", "Single", "Other")),
+         income_bracket = mapvalues(income_bracket, from = as.character(1:7), to = 
+                                      c("<20,000", "20,000 to <40,000", "40,000 to <80,000", 
+                                        "80,000 to 120,000", "> 120,000", "Refuse to Respond","Missing")),
+         Agecat = mapvalues(Agecat, from = c("0", "1"), to = c("younger", "older"))
+  )%>%arrange(uniqueID)
+
+#remove dataset from the environment
+rm(IDiagnosisCW, InpatientVisits, InpatientVisits_A1, LabCW, MedicationCW, Medications,ODiagnosisCW, OutpatientLabs, OutpatientVisits, OutpatientVisits_A1, CohortCW, A1)
+
+
+```
+
+## Data Description
+After the database connecting, reformating and creating new summary variable by unique ID(patient),
+we get a finaldata includes the personal information, past diagnose(both in and out hospital) and prescription recording.  
+
+#### FINALDATA have `r dim(FINALDATA)[1]` obeservations and `r dim(FINALDATA)[2]` variables
+
+- **uniqueID** - patient ID unique for each patient
+- **Sex** - gender for each patient
+- **Birthdate**- Birthdat of each patient with format(mm/dd/yyyy)
+- **race** - race of paitients including Asian/Black/Native American/Pacific Islander/Unknown/White
+- **martital_status** - martital_status of patients(Divorced/Married/Other/Separated/Single/Widowed)
+- **income_braket** - income of patients (<20,000/> 120,000/20,000 to <40,000/40,000 to <80,000/80,000 to 120,000/Missing/Refuse to Respond)
+- **Age** - age of patient(round to 2 decimals)
+- **Agecat** - age category(younger/older)
+- **A1** - Indicator of whether an individual has chronic condition A1 prior to 2015
+- **DiseaseX** - Indicator of whether an individual has been diagnosed with disease X
+- **WE_indicator** - Indicator of receipt of prescription WE any time during 2015 and 2016 for those with chronic condition A1 prior to 2015 (A1 created above)
+- **WE_6_M** - Indicator of receipt of WE longer than 6 months.
+
+
+---
+
+---
+
+#### 0
+We can see the detail of the final data(head&tail) as follows.
+```{r}
+#produce data report
+kable(head(FINALDATA,5), caption = "First 5 observations of the FINALDATA")
+kable(tail(FINALDATA,5), caption = "Last 5 observations of the FINALDATA")
+```
+
+---
+
+#### A
+
+```{r, fig.height = 3.5, fig.width = 5.5, fig.align = "center"}
+kable(table(FINALDATA$sex), col.names = c("sex","freqency"), caption ="A table with the frequency distribution of sex in FINALDATA")
+kable(table(FINALDATA$race), col.names = c("race","freqency"), caption ="A table with the frequency distribution of race in FINALDATA")
+kable(table(FINALDATA$marital_status), col.names = c("marital status","freqency"), caption ="A table with the frequency distribution of marital_status in FINALDATA")
+kable(table(FINALDATA$income_bracket), col.names = c("income bracket","freqency"), caption ="A table with the frequency distribution of income_bracket in FINALDATA")
+kable(table(FINALDATA$Agecat), col.names = c("age category","freqency"), caption ="A table with the frequency distribution of Agecat in FINALDATA")
+
+plot1 <- ggplot(FINALDATA, aes(x=Age)) +
+  geom_histogram(bins = 20,position="identity", color = "white")+ggtitle("Distribution of Age in Final data")+theme_bw();plot1
+```
+
+---
+
+#### B
+ The proportion of individuals in the cohort had chronic condition A1 prior to 2015 is `r round(sum(FINALDATA$A1)/length(FINALDATA$A1)*100,2)` \%.
+
+---
+
+#### C
+```{r}
+table_C <- table(FINALDATA$A1,FINALDATA$Agecat)
+rownames(table_C) = c("No chronic condition A1","chronic condition A1")
+kable(table_C, caption = "age distribution of chronic condition A1 in this population" )
+```
+
+---
+
+#### D
+proportion of individuals have disease X is `r round(sum(FINALDATA$DiseaseX)/length(FINALDATA$DiseaseX)*100,2)` \%.
+
+---
+
+#### E
+```{r}
+table_E <- table(FINALDATA$DiseaseX,FINALDATA$sex)
+rownames(table_E) = c("No DiseaseX","Have DiseaseX")
+kable(table_E, caption = "gender distribution of disease X in the population" )
+```
+
+---
+
+#### F
+The proportion of individuals classified as having chronic condition A1 prior to 2015,received a prescription for WE (medication name) during the 2015 and 2016 calendar years is `r round(sum(FINALDATA$WE_indicator)/(sum(FINALDATA$A1))*100,2)` \%.
+
+---
+
+#### G
+```{r}
+table_G <- table(FINALDATA$race,FINALDATA$WE_indicator)
+kable(table_G, caption = "the breakdown by race of individuals classified as having chronic condition A1 prior to 2015 and received a prescription for WE (medication name) during the 2015 and 2016 calendar years", col.names = c("Yes(WE& DieaseA1)","No(WE& DieaseA1)") )
+```
+
+---
+
+#### H
+  proportion of individuals classified as having chronic condition A1 prior to 2015 receiving a prescription for WE (medication name) during the 2015 and 2016 calendar years would be covered longer than 6-month over this time frame is `r round(sum(FINALDATA$WE_6_M&FINALDATA$A1)/(sum(FINALDATA$A1))*100,2)` \%.
