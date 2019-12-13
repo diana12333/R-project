@@ -6,9 +6,14 @@ It's a visualization project to visualize the time series data of australia weat
 publish at [shinyaap.io changshen](https://changshen.shinyapps.io/shiny/)
 
 ## multivariate time series（Sydney Weather Forecasting） 
-### 1.The presentation slide available at [here](https://slides.com/changshen/multivariate#/)
-### 2. The proposal and report
-### 3. code for data manipulation and modelling(to be uploaded)
+#### 1.The presentation slide available at [here](https://slides.com/changshen/multivariate#/)
+#### 2. The proposal and report
+#### 3. code for data manipulation and modelling(to be uploaded)
+
+## Data Manipulation
+### Use advanced R to conduct data manipulation and anlysis 
+#### 1.Clinical Data
+including the database join(merge),cleaning, format standardization(from SAS to R), group and summarize
 
 ## Myfunction
 list some of the simple functions I write for statistical computing or visualization
@@ -50,6 +55,7 @@ testa <- stratified(t=2, s=4, samplesize = 100, equal = TRUE, seed = 89676);test
 testb <- stratified(t=3, s=3, samplesize = c(80, 70, 50), equal = FALSE, seed = 124589);testb
 testc <- stratified(t=5, s=3, samplesize = 60, equal = TRUE, seed = 907563);testc
 ```
+
 
 ## Daxing Population Analysis
 ### the Map Visualization of Anaysis is as follows
