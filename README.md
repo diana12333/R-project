@@ -1,5 +1,9 @@
 # R-project
 
+#Old Faithful data manipulation project
+> regex expression /rmd report/ rmd latex
+see the report
+
 ## shiny
 
 It's a visualization project to visualize the time series data of australia weather and spatial map visualization from 2013 to 2017.
