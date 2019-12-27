@@ -3,7 +3,7 @@
 #Old Faithful data manipulation project
 > regex expression /rmd report/ rmd latex
 
-see the report[here](https://htmlpreview.github.io/?https://github.com/diana12333/R-project/blob/master/Old%20Faithful%20Raw%20Data%20manipulation%20and%20Modeling/OldFaithful_DanEdit.html)
+see the report [here](https://htmlpreview.github.io/?https://github.com/diana12333/R-project/blob/master/Old%20Faithful%20Raw%20Data%20manipulation%20and%20Modeling/OldFaithful_DanEdit.html)
 
 ## shiny
 
