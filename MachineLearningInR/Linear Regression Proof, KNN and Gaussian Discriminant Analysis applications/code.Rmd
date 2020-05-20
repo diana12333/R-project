@@ -1,0 +1,950 @@
+---
+title: "Assignment 1"
+author: "Statistics and Data Science 365/565"
+date: 'Due: Monday February 3rd 11:59pm'
+header-includes:
+      - \usepackage{etoolbox}
+      - \usepackage[doublespacing]{setspace}
+      - \usepackage{relsize}
+
+output:
+  pdf_document: 
+      latex_engine: xelatex
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,error = TRUE)
+```
+
+# Problem 1: Two views of linear regression (10 points)
+
+## Problem 1 View 1
+
+$$
+\hat \beta = argmin\mid\mid Y - X \beta \mid\mid^2 
+$$
+where $\beta \in \mathbf{R}^P$
+
+To minimize this, we scan solve the partial derivative by $\beta$ = 0
+$$
+\frac{\partial \mid\mid Y - X \beta \mid\mid^2}{\partial \beta} = X^{T}(Y - X \beta) =0\
+$$
+$$
+X^{T}Y - X^{T}X \beta=0
+$$
+$$
+\hat \beta = (X^{T}X)^{-1}X^{T}Y 
+$$
+
+## Problem 1 View 2
+we have the density of y as 
+$$
+f(y)=\frac{1}{\sqrt{|2 \pi \Sigma|}} \exp \left(-\frac{1}{2}(y-X\beta)^{T} \Sigma^{-1}(y-X\beta)\right)
+$$
+then we consider the log density of y, use mle, maximized the likehood of $\beta$
+
+$$
+L(\beta)= log(f(x_1)f(x_2)\dots f(x_n))= \Sigma_{i =1}^{n}\left(-\frac{1}{2}(y_i-x_i\beta)^{T} \Sigma^{-1}(y_i-x_i\beta)\right)-log(\sqrt{|2 \pi \Sigma|} )
+$$
+$$
+     = \Sigma_{i =1}^{n}\left(-\frac{1}{2}(y_i-x_i\beta)^{T}(y_i-x_i\beta)\right)-log(\sqrt{|2 \pi \sigma|} ) \\
+$$
+$$
+\frac{\partial L(\beta)}{\partial \beta} = -\frac{1}{2}(\Sigma_{i =1}^{n}(y_i -x_i\beta)x_i) = 0 
+$$
+$$
+\hat \beta =\frac{\Sigma_{i =1}^{n}x_iy_i}{\Sigma_{i =1}^{n}x_i^2}
+$$
+the $\beta$ solved in this way is exatly same as view 1 since $\Sigma_{i =1}^{n}\left(-\frac{1}{2}(y_i-x_i\beta)^{T}(y_i-x_i\beta)\right)$ can also be written as 
+$\left(-\frac{1}{2}(Y-X\beta)^{T}(Y-X\beta)\right)$ and $\Sigma_{i =1}^{n}x_iy_i =X^{T}Y$，$\Sigma_{i =1}^{n}x_i^2 =X^{T}X$
+# Problem 2: Linear regression and classification (30 points)
+
+
+## Problem 2 Part a. 
+
+**The summary statistics, the scatter plot, box plot shows as follows, we can find some extreme values and outliers**
+
+- Strange stations number distributions
+
+  the density function of the station numbers have two peak, with $75\%$ of days the total number of the stations below 331, while the $20\%$  days the total number of the stations within the range of $424 \sim 475$
+
+
+\begin{spacing}{0.7}
+\begin{center}\textbf{ citi\_train \\ 11 Variables~~~~~ 1001 ~Observations}\end{center}
+\smallskip\hrule\smallskip{\small
+\vbox{\noindent\textbf{trips}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){15}}
+\put(14,0){\line(0,1){8}}
+\put(29,0){\line(0,1){4}}
+\put(43,0){\line(0,1){27}}
+\put(58,0){\line(0,1){15}}
+\put(72,0){\line(0,1){15}}
+\put(87,0){\line(0,1){27}}
+\put(101,0){\line(0,1){27}}
+\put(115,0){\line(0,1){50}}
+\put(130,0){\line(0,1){12}}
+\put(144,0){\line(0,1){27}}
+\put(159,0){\line(0,1){27}}
+\put(173,0){\line(0,1){19}}
+\put(187,0){\line(0,1){38}}
+\put(202,0){\line(0,1){46}}
+\put(216,0){\line(0,1){46}}
+\put(231,0){\line(0,1){42}}
+\put(245,0){\line(0,1){46}}
+\put(260,0){\line(0,1){58}}
+\put(274,0){\line(0,1){31}}
+\put(288,0){\line(0,1){27}}
+\put(303,0){\line(0,1){19}}
+\put(317,0){\line(0,1){38}}
+\put(332,0){\line(0,1){38}}
+\put(346,0){\line(0,1){50}}
+\put(360,0){\line(0,1){69}}
+\put(375,0){\line(0,1){38}}
+\put(389,0){\line(0,1){38}}
+\put(404,0){\line(0,1){42}}
+\put(418,0){\line(0,1){38}}
+\put(433,0){\line(0,1){42}}
+\put(447,0){\line(0,1){54}}
+\put(461,0){\line(0,1){38}}
+\put(476,0){\line(0,1){27}}
+\put(490,0){\line(0,1){58}}
+\put(505,0){\line(0,1){46}}
+\put(519,0){\line(0,1){42}}
+\put(533,0){\line(0,1){23}}
+\put(548,0){\line(0,1){35}}
+\put(562,0){\line(0,1){50}}
+\put(577,0){\line(0,1){35}}
+\put(591,0){\line(0,1){38}}
+\put(606,0){\line(0,1){42}}
+\put(620,0){\line(0,1){58}}
+\put(634,0){\line(0,1){27}}
+\put(649,0){\line(0,1){42}}
+\put(663,0){\line(0,1){46}}
+\put(678,0){\line(0,1){46}}
+\put(692,0){\line(0,1){54}}
+\put(707,0){\line(0,1){58}}
+\put(721,0){\line(0,1){42}}
+\put(735,0){\line(0,1){50}}
+\put(750,0){\line(0,1){69}}
+\put(764,0){\line(0,1){62}}
+\put(779,0){\line(0,1){77}}
+\put(793,0){\line(0,1){54}}
+\put(807,0){\line(0,1){38}}
+\put(822,0){\line(0,1){46}}
+\put(836,0){\line(0,1){62}}
+\put(851,0){\line(0,1){69}}
+\put(865,0){\line(0,1){54}}
+\put(880,0){\line(0,1){96}}
+\put(894,0){\line(0,1){62}}
+\put(908,0){\line(0,1){73}}
+\put(923,0){\line(0,1){77}}
+\put(937,0){\line(0,1){58}}
+\put(952,0){\line(0,1){62}}
+\put(966,0){\line(0,1){88}}
+\put(980,0){\line(0,1){100}}
+\put(995,0){\line(0,1){81}}
+\put(1009,0){\line(0,1){54}}
+\put(1024,0){\line(0,1){50}}
+\put(1038,0){\line(0,1){50}}
+\put(1053,0){\line(0,1){77}}
+\put(1067,0){\line(0,1){50}}
+\put(1081,0){\line(0,1){54}}
+\put(1096,0){\line(0,1){31}}
+\put(1110,0){\line(0,1){31}}
+\put(1125,0){\line(0,1){23}}
+\put(1139,0){\line(0,1){23}}
+\put(1154,0){\line(0,1){27}}
+\put(1168,0){\line(0,1){15}}
+\put(1182,0){\line(0,1){15}}
+\put(1197,0){\line(0,1){23}}
+\put(1211,0){\line(0,1){31}}
+\put(1226,0){\line(0,1){4}}
+\put(1240,0){\line(0,1){4}}
+\put(1254,0){\line(0,1){23}}
+\put(1283,0){\line(0,1){12}}
+\put(1312,0){\line(0,1){4}}
+\put(1327,0){\line(0,1){8}}
+\put(1341,0){\line(0,1){4}}
+\put(1355,0){\line(0,1){4}}
+\put(1370,0){\line(0,1){15}}
+\put(1384,0){\line(0,1){12}}
+\put(1399,0){\line(0,1){15}}
+\put(1413,0){\line(0,1){12}}
+\put(1427,0){\line(0,1){8}}
+\put(1442,0){\line(0,1){4}}
+\put(1456,0){\line(0,1){4}}
+\put(1485,0){\line(0,1){4}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&987&1&25022&13187& 5401& 8645&15545&26629&34208&38485&42170 \end{tabular}
+\begin{verbatim}
+
+lowest :   876  1107  1144  1214  1459, highest: 50285 50705 51179 51368 52706
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{n\_stations}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){2}}
+\put(49,0){\line(0,1){1}}
+\put(89,0){\line(0,1){1}}
+\put(122,0){\line(0,1){1}}
+\put(154,0){\line(0,1){1}}
+\put(162,0){\line(0,1){1}}
+\put(170,0){\line(0,1){2}}
+\put(178,0){\line(0,1){2}}
+\put(186,0){\line(0,1){2}}
+\put(195,0){\line(0,1){1}}
+\put(203,0){\line(0,1){6}}
+\put(211,0){\line(0,1){11}}
+\put(219,0){\line(0,1){22}}
+\put(227,0){\line(0,1){20}}
+\put(235,0){\line(0,1){16}}
+\put(243,0){\line(0,1){29}}
+\put(251,0){\line(0,1){59}}
+\put(259,0){\line(0,1){68}}
+\put(268,0){\line(0,1){100}}
+\put(276,0){\line(0,1){79}}
+\put(284,0){\line(0,1){60}}
+\put(292,0){\line(0,1){67}}
+\put(300,0){\line(0,1){55}}
+\put(308,0){\line(0,1){33}}
+\put(316,0){\line(0,1){18}}
+\put(324,0){\line(0,1){5}}
+\put(357,0){\line(0,1){1}}
+\put(405,0){\line(0,1){1}}
+\put(446,0){\line(0,1){2}}
+\put(454,0){\line(0,1){1}}
+\put(503,0){\line(0,1){1}}
+\put(559,0){\line(0,1){1}}
+\put(624,0){\line(0,1){1}}
+\put(697,0){\line(0,1){1}}
+\put(754,0){\line(0,1){1}}
+\put(762,0){\line(0,1){2}}
+\put(794,0){\line(0,1){1}}
+\put(835,0){\line(0,1){1}}
+\put(908,0){\line(0,1){1}}
+\put(948,0){\line(0,1){3}}
+\put(965,0){\line(0,1){1}}
+\put(981,0){\line(0,1){2}}
+\put(997,0){\line(0,1){1}}
+\put(1013,0){\line(0,1){2}}
+\put(1021,0){\line(0,1){1}}
+\put(1038,0){\line(0,1){2}}
+\put(1046,0){\line(0,1){1}}
+\put(1070,0){\line(0,1){1}}
+\put(1078,0){\line(0,1){1}}
+\put(1111,0){\line(0,1){1}}
+\put(1119,0){\line(0,1){3}}
+\put(1151,0){\line(0,1){1}}
+\put(1159,0){\line(0,1){3}}
+\put(1167,0){\line(0,1){2}}
+\put(1175,0){\line(0,1){3}}
+\put(1184,0){\line(0,1){2}}
+\put(1200,0){\line(0,1){3}}
+\put(1208,0){\line(0,1){2}}
+\put(1216,0){\line(0,1){1}}
+\put(1224,0){\line(0,1){1}}
+\put(1232,0){\line(0,1){1}}
+\put(1240,0){\line(0,1){1}}
+\put(1248,0){\line(0,1){1}}
+\put(1257,0){\line(0,1){2}}
+\put(1265,0){\line(0,1){2}}
+\put(1273,0){\line(0,1){1}}
+\put(1281,0){\line(0,1){1}}
+\put(1289,0){\line(0,1){1}}
+\put(1305,0){\line(0,1){2}}
+\put(1313,0){\line(0,1){2}}
+\put(1321,0){\line(0,1){4}}
+\put(1329,0){\line(0,1){4}}
+\put(1338,0){\line(0,1){3}}
+\put(1346,0){\line(0,1){2}}
+\put(1354,0){\line(0,1){3}}
+\put(1362,0){\line(0,1){3}}
+\put(1370,0){\line(0,1){4}}
+\put(1378,0){\line(0,1){3}}
+\put(1386,0){\line(0,1){9}}
+\put(1394,0){\line(0,1){7}}
+\put(1402,0){\line(0,1){10}}
+\put(1411,0){\line(0,1){10}}
+\put(1419,0){\line(0,1){10}}
+\put(1427,0){\line(0,1){9}}
+\put(1435,0){\line(0,1){9}}
+\put(1443,0){\line(0,1){17}}
+\put(1451,0){\line(0,1){10}}
+\put(1459,0){\line(0,1){9}}
+\put(1467,0){\line(0,1){6}}
+\put(1475,0){\line(0,1){3}}
+\put(1484,0){\line(0,1){1}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&91&0.996&354.2&48.7&319&321&324&327&331&465&470 \end{tabular}
+\begin{verbatim}
+
+lowest : 292 298 303 307 311, highest: 471 472 473 474 475
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+
+\vbox{\noindent\textbf{PRCP}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){100}}
+\put(15,0){\line(0,1){9}}
+\put(30,0){\line(0,1){4}}
+\put(44,0){\line(0,1){3}}
+\put(59,0){\line(0,1){2}}
+\put(74,0){\line(0,1){2}}
+\put(89,0){\line(0,1){2}}
+\put(103,0){\line(0,1){3}}
+\put(118,0){\line(0,1){1}}
+\put(133,0){\line(0,1){1}}
+\put(148,0){\line(0,1){1}}
+\put(162,0){\line(0,1){1}}
+\put(177,0){\line(0,1){1}}
+\put(192,0){\line(0,1){1}}
+\put(207,0){\line(0,1){1}}
+\put(221,0){\line(0,1){1}}
+\put(236,0){\line(0,1){1}}
+\put(251,0){\line(0,1){1}}
+\put(266,0){\line(0,1){1}}
+\put(280,0){\line(0,1){1}}
+\put(295,0){\line(0,1){1}}
+\put(325,0){\line(0,1){1}}
+\put(339,0){\line(0,1){1}}
+\put(354,0){\line(0,1){1}}
+\put(369,0){\line(0,1){1}}
+\put(384,0){\line(0,1){1}}
+\put(398,0){\line(0,1){1}}
+\put(413,0){\line(0,1){1}}
+\put(428,0){\line(0,1){1}}
+\put(443,0){\line(0,1){1}}
+\put(457,0){\line(0,1){1}}
+\put(472,0){\line(0,1){1}}
+\put(531,0){\line(0,1){1}}
+\put(575,0){\line(0,1){1}}
+\put(590,0){\line(0,1){1}}
+\put(620,0){\line(0,1){1}}
+\put(752,0){\line(0,1){1}}
+\put(1461,0){\line(0,1){1}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&103&0.685&0.1193&0.2104&0.00&0.00&0.00&0.00&0.04&0.36&0.73 \end{tabular}
+\begin{verbatim}
+
+lowest : 0.00 0.01 0.02 0.03 0.04, highest: 1.95 1.98 2.10 2.54 4.97
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{SNWD}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){100}}
+\put(76,0){\line(0,1){1}}
+\put(91,0){\line(0,1){2}}
+\put(151,0){\line(0,1){1}}
+\put(234,0){\line(0,1){1}}
+\put(295,0){\line(0,1){1}}
+\put(385,0){\line(0,1){1}}
+\put(446,0){\line(0,1){2}}
+\put(537,0){\line(0,1){1}}
+\put(597,0){\line(0,1){2}}
+\put(688,0){\line(0,1){1}}
+\put(741,0){\line(0,1){1}}
+\put(831,0){\line(0,1){1}}
+\put(892,0){\line(0,1){1}}
+\put(983,0){\line(0,1){1}}
+\put(1073,0){\line(0,1){1}}
+\put(1134,0){\line(0,1){1}}
+\put(1217,0){\line(0,1){1}}
+\put(1277,0){\line(0,1){1}}
+\put(1368,0){\line(0,1){1}}
+\put(1429,0){\line(0,1){1}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&21&0.321&0.8932&1.647&0.0&0.0&0.0&0.0&0.0&2.0&7.9 \end{tabular}
+\begin{verbatim}
+
+lowest :  0.0  1.0  1.2  2.0  3.1, highest: 15.0 16.1 16.9 18.1 18.9
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{SNOW}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){100}}
+\put(13,0){\line(0,1){1}}
+\put(26,0){\line(0,1){1}}
+\put(40,0){\line(0,1){1}}
+\put(53,0){\line(0,1){1}}
+\put(66,0){\line(0,1){1}}
+\put(92,0){\line(0,1){1}}
+\put(105,0){\line(0,1){1}}
+\put(119,0){\line(0,1){1}}
+\put(132,0){\line(0,1){1}}
+\put(158,0){\line(0,1){1}}
+\put(185,0){\line(0,1){1}}
+\put(198,0){\line(0,1){1}}
+\put(211,0){\line(0,1){1}}
+\put(237,0){\line(0,1){1}}
+\put(330,0){\line(0,1){1}}
+\put(395,0){\line(0,1){1}}
+\put(409,0){\line(0,1){1}}
+\put(435,0){\line(0,1){1}}
+\put(475,0){\line(0,1){1}}
+\put(527,0){\line(0,1){1}}
+\put(567,0){\line(0,1){1}}
+\put(593,0){\line(0,1){1}}
+\put(633,0){\line(0,1){1}}
+\put(659,0){\line(0,1){1}}
+\put(725,0){\line(0,1){1}}
+\put(989,0){\line(0,1){1}}
+\put(1055,0){\line(0,1){1}}
+\put(1252,0){\line(0,1){1}}
+\put(1450,0){\line(0,1){1}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&30&0.129&0.1131&0.2216&0&0&0&0&0&0&0 \end{tabular}
+\begin{verbatim}
+
+lowest :  0.0  0.1  0.2  0.3  0.4, highest:  5.5  7.5  8.0  9.5 11.0
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{TMAX}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){3}}
+\put(36,0){\line(0,1){3}}
+\put(54,0){\line(0,1){3}}
+\put(71,0){\line(0,1){6}}
+\put(89,0){\line(0,1){6}}
+\put(107,0){\line(0,1){12}}
+\put(125,0){\line(0,1){9}}
+\put(143,0){\line(0,1){9}}
+\put(161,0){\line(0,1){6}}
+\put(179,0){\line(0,1){6}}
+\put(196,0){\line(0,1){9}}
+\put(214,0){\line(0,1){15}}
+\put(232,0){\line(0,1){6}}
+\put(250,0){\line(0,1){21}}
+\put(268,0){\line(0,1){24}}
+\put(286,0){\line(0,1){26}}
+\put(304,0){\line(0,1){41}}
+\put(321,0){\line(0,1){26}}
+\put(339,0){\line(0,1){24}}
+\put(357,0){\line(0,1){24}}
+\put(375,0){\line(0,1){41}}
+\put(393,0){\line(0,1){41}}
+\put(411,0){\line(0,1){32}}
+\put(429,0){\line(0,1){62}}
+\put(446,0){\line(0,1){53}}
+\put(464,0){\line(0,1){18}}
+\put(482,0){\line(0,1){53}}
+\put(500,0){\line(0,1){35}}
+\put(518,0){\line(0,1){47}}
+\put(536,0){\line(0,1){35}}
+\put(553,0){\line(0,1){44}}
+\put(571,0){\line(0,1){35}}
+\put(589,0){\line(0,1){24}}
+\put(607,0){\line(0,1){38}}
+\put(625,0){\line(0,1){24}}
+\put(643,0){\line(0,1){38}}
+\put(661,0){\line(0,1){44}}
+\put(678,0){\line(0,1){38}}
+\put(696,0){\line(0,1){41}}
+\put(714,0){\line(0,1){56}}
+\put(732,0){\line(0,1){41}}
+\put(750,0){\line(0,1){47}}
+\put(768,0){\line(0,1){35}}
+\put(786,0){\line(0,1){41}}
+\put(803,0){\line(0,1){41}}
+\put(821,0){\line(0,1){50}}
+\put(839,0){\line(0,1){41}}
+\put(857,0){\line(0,1){41}}
+\put(875,0){\line(0,1){62}}
+\put(893,0){\line(0,1){50}}
+\put(911,0){\line(0,1){29}}
+\put(928,0){\line(0,1){59}}
+\put(946,0){\line(0,1){38}}
+\put(964,0){\line(0,1){32}}
+\put(982,0){\line(0,1){50}}
+\put(1000,0){\line(0,1){76}}
+\put(1018,0){\line(0,1){47}}
+\put(1036,0){\line(0,1){71}}
+\put(1053,0){\line(0,1){26}}
+\put(1071,0){\line(0,1){38}}
+\put(1089,0){\line(0,1){44}}
+\put(1107,0){\line(0,1){47}}
+\put(1125,0){\line(0,1){44}}
+\put(1143,0){\line(0,1){47}}
+\put(1161,0){\line(0,1){71}}
+\put(1178,0){\line(0,1){56}}
+\put(1196,0){\line(0,1){88}}
+\put(1214,0){\line(0,1){100}}
+\put(1232,0){\line(0,1){50}}
+\put(1250,0){\line(0,1){71}}
+\put(1268,0){\line(0,1){50}}
+\put(1286,0){\line(0,1){71}}
+\put(1303,0){\line(0,1){53}}
+\put(1321,0){\line(0,1){41}}
+\put(1339,0){\line(0,1){44}}
+\put(1357,0){\line(0,1){15}}
+\put(1375,0){\line(0,1){15}}
+\put(1393,0){\line(0,1){12}}
+\put(1411,0){\line(0,1){9}}
+\put(1428,0){\line(0,1){6}}
+\put(1446,0){\line(0,1){9}}
+\put(1464,0){\line(0,1){6}}
+\put(1482,0){\line(0,1){3}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&83&1&62.62&21.9&31&36&46&64&80&86&89 \end{tabular}
+\begin{verbatim}
+
+lowest : 15 17 18 19 20, highest: 94 95 96 97 98
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{TMIN}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){3}}
+\put(53,0){\line(0,1){3}}
+\put(71,0){\line(0,1){3}}
+\put(88,0){\line(0,1){10}}
+\put(106,0){\line(0,1){3}}
+\put(123,0){\line(0,1){3}}
+\put(141,0){\line(0,1){3}}
+\put(159,0){\line(0,1){17}}
+\put(176,0){\line(0,1){13}}
+\put(194,0){\line(0,1){3}}
+\put(212,0){\line(0,1){7}}
+\put(229,0){\line(0,1){10}}
+\put(247,0){\line(0,1){23}}
+\put(265,0){\line(0,1){20}}
+\put(282,0){\line(0,1){3}}
+\put(300,0){\line(0,1){30}}
+\put(318,0){\line(0,1){13}}
+\put(335,0){\line(0,1){27}}
+\put(353,0){\line(0,1){30}}
+\put(370,0){\line(0,1){20}}
+\put(388,0){\line(0,1){37}}
+\put(406,0){\line(0,1){37}}
+\put(423,0){\line(0,1){27}}
+\put(441,0){\line(0,1){40}}
+\put(459,0){\line(0,1){33}}
+\put(476,0){\line(0,1){40}}
+\put(494,0){\line(0,1){47}}
+\put(512,0){\line(0,1){30}}
+\put(529,0){\line(0,1){40}}
+\put(547,0){\line(0,1){43}}
+\put(564,0){\line(0,1){63}}
+\put(582,0){\line(0,1){53}}
+\put(600,0){\line(0,1){33}}
+\put(617,0){\line(0,1){47}}
+\put(635,0){\line(0,1){70}}
+\put(653,0){\line(0,1){77}}
+\put(670,0){\line(0,1){47}}
+\put(688,0){\line(0,1){47}}
+\put(706,0){\line(0,1){53}}
+\put(723,0){\line(0,1){67}}
+\put(741,0){\line(0,1){60}}
+\put(758,0){\line(0,1){87}}
+\put(776,0){\line(0,1){40}}
+\put(794,0){\line(0,1){77}}
+\put(811,0){\line(0,1){40}}
+\put(829,0){\line(0,1){53}}
+\put(847,0){\line(0,1){27}}
+\put(864,0){\line(0,1){53}}
+\put(882,0){\line(0,1){30}}
+\put(900,0){\line(0,1){70}}
+\put(917,0){\line(0,1){77}}
+\put(935,0){\line(0,1){53}}
+\put(953,0){\line(0,1){70}}
+\put(970,0){\line(0,1){43}}
+\put(988,0){\line(0,1){67}}
+\put(1005,0){\line(0,1){63}}
+\put(1023,0){\line(0,1){63}}
+\put(1041,0){\line(0,1){33}}
+\put(1058,0){\line(0,1){63}}
+\put(1076,0){\line(0,1){40}}
+\put(1094,0){\line(0,1){53}}
+\put(1111,0){\line(0,1){30}}
+\put(1129,0){\line(0,1){73}}
+\put(1147,0){\line(0,1){87}}
+\put(1164,0){\line(0,1){73}}
+\put(1182,0){\line(0,1){73}}
+\put(1199,0){\line(0,1){70}}
+\put(1217,0){\line(0,1){100}}
+\put(1235,0){\line(0,1){60}}
+\put(1252,0){\line(0,1){87}}
+\put(1270,0){\line(0,1){73}}
+\put(1288,0){\line(0,1){80}}
+\put(1305,0){\line(0,1){40}}
+\put(1323,0){\line(0,1){27}}
+\put(1341,0){\line(0,1){33}}
+\put(1358,0){\line(0,1){33}}
+\put(1376,0){\line(0,1){20}}
+\put(1394,0){\line(0,1){20}}
+\put(1411,0){\line(0,1){3}}
+\put(1446,0){\line(0,1){7}}
+\put(1464,0){\line(0,1){3}}
+\put(1482,0){\line(0,1){3}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&82&1&48.12&20.65&17&23&35&50&64&71&73 \end{tabular}
+\begin{verbatim}
+
+lowest : -1  2  3  4  5, highest: 78 79 81 82 83
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+\vbox{\noindent\textbf{AWND}\setlength{\unitlength}{0.001in}\hfill\begin{picture}(1.5,.1)(1500,0)\linethickness{0.6pt}
+\put(0,0){\line(0,1){1}}
+\put(998,0){\line(0,1){100}}
+\put(1000,0){\line(0,1){5}}
+\end{picture}
+
+{\smaller
+\begin{tabular}{ rrrrrrrrrrrrr }
+n&missing&distinct&Info&Mean&Gmd&.05&.10&.25&.50&.75&.90&.95 \\
+1001&0&59&0.999&-24.61&62.37&2.2&2.7&3.8&4.9&6.7&8.5&9.8 \end{tabular}
+\begin{verbatim}
+                               
+Value      -10000      0     20
+Frequency       3    948     50
+Proportion  0.003  0.947  0.050
+\end{verbatim}
+}
+\smallskip\hrule\smallskip
+}
+}\end{spacing}
+
+
+
+### Outliers
+- **PRCP SNWD SNOW** 
+
+Rainfall and snowfall belong to the small probability event, most days of our data there will be no snow or rain, thus the distribution of PRCP SNWD SNOW shoule be a skewed distribution naturally. However, we still need to discriminate the outliers. To acquire rigorious decision, we refered to the 
+**[nyuweather](http://www.cnyweather.com/wxraindetail.php?year=2015)** and distribution of *non zero PRCP SNWD SNOW*,the precipitation should be smaller than 2, SNOW should be smaller than 8.0, outliers imputed with the average precipitation within the month
+
+- **WIND**
+
+from the descriptive statistics and the boxplot, we find there is an observation has a -10000 windspeed, which contradicts the definiation of the windspeed, wind doesn't have such strong seasonality, thus we remove this single outlier. After removing the unreasonable value, we recheck the outlier, eliminate the 24 outliers(with windspeed >10).
+
+
+### correlations within predictors
+
+After manipulating the outlier, we final start to analyze the realtionship within predictors 
+
+- **TMAX is closely related to the TMIN** 
+
+The maximum temperature for the day is postively correlated to the minimum temperature for the day, we can conclude both from common sense and the scatter plot($r = 0.967$), in the linear regression model we might need to consider removing multicollinearity of the two predictor, after reexaming the data we find out that during the sepetmber of 2015, there is a increase in the number of the stations, this might due to the citi bike is expanding its scale at that time. Thus, even though in boxplot, many observations are marked as the outliers, we cann't change its valuee or remove them.
+
+- **Other strong relationships** 
+
+Windspeed $AWND$ has negative linear relationship with TMAX($r = -.502$) and TMIN($r = -.491$); Snowfall also has negative linear relationship with TMAX($r = -.43$) and TMIN($r = -.441$)
+
+```{r}
+library(pacman)
+p_load(dplyr,Hmisc,GGally,FNN,stringr,MASS,car,knitr,polynom)
+citi_train <- read.csv("citibike_train.csv")
+citi_test <- read.csv("citibike_test.csv")
+weather <- read.csv("weather.csv")
+
+citi_train <- citi_train%>%left_join(weather,by = 'date')%>%
+  mutate(yr =str_sub(date,-2,-1))%>%dplyr::select(-date)
+citi_test <- citi_test%>%left_join(weather,by = 'date')%>%
+  dplyr::select(-date)
+#describe(citi_train)
+ggpairs(citi_train%>%dplyr::select(-c(holiday,month,dayofweek)))
+par(mfrow = c(2,4))
+par(mar = c(2, 2, 2, 2))
+list_numeric = c(1:2,6:11)
+for(i in list_numeric){
+  boxplot(citi_train[,i],main=(names(citi_train)[i]))
+}
+
+#test whether the data is reasonable
+#return 0
+#dim(citi_train%>%filter(TMAX<=TMIN))[1]
+
+#remove the unreasonable wind speed
+citi_train <- citi_train%>%
+  filter(AWND>=0 & AWND<=11.2 &SNWD<18.9)%>%group_by(month,yr)%>%
+  mutate(PRCP = case_when(
+    (PRCP<=2) ~ PRCP,
+    (PRCP>2) ~ median(PRCP)
+  ),
+  SNOW = case_when(
+    (SNOW<=8) ~ SNOW,
+    (SNOW>8) ~ median(SNOW))
+  )%>%ungroup()%>%dplyr::select(-yr)
+
+citi_test <-citi_test%>%mutate(AWND = case_when(
+  AWND>=0 ~ AWND,
+  TRUE ~ median(AWND)
+))
+```
+
+
+## Problem 2 Part b. 
+
+below is the model with all the possible variables
+
+```{r}
+#model with all the variables
+fit <- lm(trips~.,data = citi_train)
+summary(fit)
+```
+
+#### Model Selection: use AIC to decide the best model and make sure check the multicollinearity
+**Steps** 
+
+1. for p =1,2,3,4,5 iterate all the possible combinations
+
+2. when a model with lower AIC comes up, update the best model for the p
+
+3. control multicollinearity by elimating the model with any parameters VIF>4
+
+4. test whether the situations without intercept would have better performance
+
+```{r}
+#model selection
+best <- list()
+#q = 1
+fit0 = lm(trips~1,data = citi_train) 
+best[[1]]<-list(fit0,NULL)
+
+#consider the conditions that has intercept
+for (i in 1:4){
+  AIC <- 10^10
+  for (iter in 1:dim(combn(10, i))[2]){
+    df <- data.frame(citi_train[,c(1,combn(10, i)[,iter]+1)])
+    fit_temp <- lm(trips~.,data = df)
+    #if(i>2){print(car::vif(fit_temp))}
+    if(i >1&& any(car::vif(fit_temp)>4)){next}
+    if (AIC >AIC(fit_temp)){
+      best[[i+1]]<- list(fit_temp,names(citi_train)[combn(10, i)[,iter]+1])
+    }
+  }
+}
+#consider the conditions that no intercept
+for (i in 1:5){
+  AIC <- AIC(best[[i]][[1]])
+  for (iter in 1:dim(combn(10, i))[2]){
+    df <- data.frame(citi_train[,c(1,combn(10, i)[,iter]+1)])
+    fit_temp <- lm(trips~.-1,data = df)
+    #if(i>2){print(car::vif(fit_temp))}
+    if(i >1&& any(car::vif(fit_temp)>4)){next}
+    if (AIC >AIC(fit_temp)){
+      best[[i]]<- list(fit_temp,names(citi_train)[combn(10, i)[,iter]+1])
+    }
+  }
+}
+
+```
+
+```{r mse rsq}
+mse <- function(sm) 
+    mean(sm$residuals^2)
+rsq <- function (preds, actual,y) {
+  rss <- sum((preds -  (actual)) ^ 2) ## residual sum of squares
+  ess <- sum((preds -  mean(actual)) ^ 2)  
+  tss <- sum((actual - mean(y)) ^ 2)  ## total sum of squares
+rsq <-  1-rss/tss}
+modelperf <- data.frame()
+model <- NULL
+for (i in 1:5){
+  sm <- summary(best[[i]][[1]])
+  y_test <- citi_test$trips
+  new_data <- citi_test%>%dplyr::select(best[[i]][[2]])
+  y_pred <- predict(best[[i]][[1]],new_data)
+  mse_test <- mean(y_pred-y_test)^2
+  model[i]<-paste(best[[i]][[2]], collapse = ',')
+  modelperf <- rbind(modelperf,
+                     c(i,mse(sm),sm$r.squared,mse_test,rsq(y_pred, y_test,citi_train$trips) ))
+}
+modelperf <- cbind(modelperf,model)
+names(modelperf)<-c('q','mse','rsq','mse_test','rsq_test','model parameter')
+kable(modelperf)
+```
+
+the second model gives the better result with least mse and largest rsq.
+
+## Problem 2 Part c. 
+
+The process of knn is showed as below, we can compare the test and train set, then pick the k = 5 since when k = 5 the test results are getting stable and reached the lowest error rate, wouldn't cause a overfitting or underfitting problem
+
+```{r}
+citi_train$train <- 1
+citi_test$train <-0
+citi_train_new <- rbind(citi_train,citi_test)%>%
+  mutate(class = ifelse(trips>median(trips),1,0))%>%
+  dplyr::select(-c(trips,holiday,month,dayofweek))
+
+
+y_train = (citi_train_new%>%filter(train ==1))$class
+X_train = (citi_train_new%>%filter(train ==1))[,-c(8,9)]
+y_test = (citi_train_new%>%filter(train ==0))$class
+X_test = (citi_train_new%>%filter(train ==0))[,-c(8,9)]
+
+X_train = scale(X_train)
+X_test = scale(X_test, center=attr(X_train, "scaled:center"), 
+                             scale=attr(X_train, "scaled:scale"))
+
+test_auc <- c()
+train_auc <- c()
+for (i in 1:50){
+  train_auc <-c(train_auc, 
+                sum(as.numeric(knn(X_train, X_train, y_train, k = i))-1!=y_train)/length(y_train))
+  test_auc <-c(test_auc, 
+               sum(as.numeric(knn(X_train, X_test, y_train, k = i))-1!=y_test)/length(y_test))
+}
+result <- data.frame(index = rep(1:50,2),
+                     class = rep(c("train","test"),each=50),auc = c(train_auc,test_auc))
+ggplot(data=result, 
+       aes(x = index, y = auc,group = class,color = class))+
+  geom_line()+facet_grid(class~.)+geom_point()
+
+```
+
+# Problem 3: Classification for a Gaussian Mixture (25 points)
+
+## Problem 3 Part a.
+For loss function $\mathbf{1}\{f(X) \neq Y\}$, 
+$$
+E(\mathbf{1}\{f(X) \neq Y\}) = P(f(X) \neq Y)
+$$
+is exactly the bayes risk, which can be minimized by the bayes rule
+where the decision boundary is $P(Y =1\mid X=x)>\frac{1}{2}$
+$$
+P(Y =1\mid X=x) = \frac{P(X\mid Y =1)P(Y=1)}{P(X\mid Y =0)P(Y=0)+P(X\mid Y =1)P(Y=1)} 
+$$
+$$
+= \frac{P(X\mid Y =1)}{P(X\mid Y =0)+P(X\mid Y =1)} = \frac{f_0(x)}{f_0(x)+f_1(x)} \geq \frac{1}{2}
+$$
+
+we simplify it as 
+
+$$
+f(X)=\left\{\begin{array}{ll}
+{1} & {\text {if }  f_1(X)>f_0(X)} \\
+{0} & {\text { else } }
+\end{array}\right.
+$$
+$$
+f_0(x)= f_1(x) \text{ when } x^2 = (x-3)^2 \Rightarrow x = \frac{3}{2}
+$$
+Thus, we have
+$$
+f(X)=\left\{\begin{array}{ll}
+{1} & {\text {if }  X>\frac{3}{2}} \\
+{0} & {\text { else } }
+\end{array}\right.
+$$
+$$
+\text{Bayes Error Rate} = P(Y = 0)P(\hat{f(X)} = 1 {\text { while }} {f(X)}=0  \mid Y =0) + P(Y =1)P(\hat{f(X)}=0 {\text { while }}{f(X)} = 1 \mid Y=1) 
+$$
+$$
+=\frac{1}{2}(0.0668072 +0.0668072) = 0.0668072
+$$
+
+## Problem 3 Part b.
+
+when the variances of two Guassians are different, the expected loss will still be minimized by the bayes classifers, but with the different decision boundary which is the root $a$ of the following equation
+$$
+f_0(x)= f_1(x) \text{ when } \frac{1}{\sqrt {2 \pi \sigma_0^2} }e^{-\frac{x^2}{2\sigma_0^2}} = \frac{1}{\sqrt {2 \pi \sigma_1^2} }e^{-\frac{(x-3)^2}{2\sigma_1^2}}
+$$
+Thus, we have
+$$
+f(X)=\left\{\begin{array}{ll}
+{1} & {\text {if }  X>a} \\
+{0} & {\text { else } }
+\end{array}\right.
+$$
+
+## Problem 3 Part c.
+
+```{r sim, fig.height = 4, fig.width = 8, fig.align = "center"}
+set.seed(22)
+n = 2000
+Y1 <- rbinom(n,1,1/2)
+mixture <- function(x){if(x==1) return(rnorm(1,3,sqrt(1.5))) else return(rnorm(1,0,sqrt(0.5)))}
+simulation<- sapply(Y1, mixture)
+sim_df <- data.frame(label = Y1,simulation = simulation)
+hist(simulation)
+test<- sample(n,n/5)
+sim_df_test <- sim_df[test,]
+sim_df_train <- sim_df[-test,]
+sim_df_train_mean <- sim_df_train%>%group_by(label)%>%summarise(mean = mean(simulation))
+```
+the decision boundary is decided by $\frac{\hat\mu_0+\hat \mu_1}{2}$ = `r solve(polynomial(c(-3-(1/2)*log(3),2,2/3)))[2]`
+$$
+f(X)=\left\{\begin{array}{ll}
+{1} & {\text{if  }  X> 1.252083 \text{  i.e. }f_1(x)>f_0(x)} \\
+{0} & {\text { else } }
+\end{array}\right.
+$$
+
+```{r}
+therhold <- solve(polynomial(c(-3-(1/2)*log(3),2,2/3)))[2]
+sim_df_test <- sim_df_test%>%
+  mutate(yhat =
+           ifelse(simulation>therhold,1,0))%>%
+  mutate(y_diff = (yhat ==label))
+estimator<-1-sum(sim_df_test$y_diff)/length(sim_df_test$y_diff)# the error rate
+```
+The predict error rate is `r estimator`
+
+## Problem 3 Part d.
+
+The variance of the error rates are overall stable when n is increasing, we can see from the plot below, since when n is large enough the estimation values $mu_1$, $\mu_0$ are
+```{r fig.height = 3, fig.width = 6}
+seq.n <- seq(from = 2000, to = 20000, by = 10)
+estimator <- c()
+for(n in seq.n){
+  Y1 <- rbinom(n,1,1/2)
+  mixture <- function(x){if(x==1) return(rnorm(1,3,sqrt(1.5))) else return(rnorm(1,0,sqrt(0.5)))}
+  simulation<- sapply(Y1, mixture)
+  sim_df <- data.frame(label = Y1,simulation = simulation)
+  sim_df_train_mean <- sim_df%>%group_by(label)%>%
+    summarise(mean = mean(simulation))%>%arrange(label)
+  mu0<- sim_df_train_mean[1,2]
+  mu1<- sim_df_train_mean[2,2]
+  #print(paste(mu0,mu1))
+  Y1_test <- rbinom(10000,1,1/2)
+  simulation_test<- sapply(Y1_test, mixture)
+  sim_df <- data.frame(label = Y1_test,simulation = simulation_test)
+  
+  #print(solve(polynomial(c(mu0^2 -(1/3)*mu1^2 -(1/2)*log(3),(2/3)*mu1-2*mu0,2/3)))[2])
+  sim_df <- sim_df%>%
+  mutate(yhat = ifelse(simulation>
+                         solve(polynomial(c(mu0^2 -(1/3)*mu1^2 -
+                                              (1/2)*log(3),(2/3)*mu1-2*mu0,2/3)))[2],1,0))%>%
+  mutate(y_diff = (yhat ==label))
+  estimator<-c(estimator,1-sum(sim_df$y_diff)/length(sim_df$y_diff))
+}
+sim <- data.frame(n = seq.n, errorate = estimator)
+
+ggplot(data = sim, aes(x = n, y=errorate))+geom_point()+ylab("error rate")+
+  xlab("number of simulation")
+
+```
