@@ -1,5 +1,26 @@
 # R-project
 
+## Machine Learning in R
+
+### Involve: 
+
+* **Implemention** :
+
+KNN from Scratch; Stochastic Gradient Descent from Scracth; 3 layer Backpropogation Neural Network from Scracth; 
+
+* **Application and Mathmatical Proof**
+
+1. Linear Regression 
+
+2. Guassian Discriminant Analysis/ Linear Discriminant Analysis
+
+3. LASSO regression and Ridge regression
+
+4. Tree based models( Random Forest/xgboost)
+
+5. WordEmbedding - Word2Vec
+
+
 ## Old Faithful data manipulation project
 > regex expression /rmd report/ rmd latex
 
